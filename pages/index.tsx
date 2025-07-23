@@ -1,5 +1,3 @@
-// pages/index.tsx
-import { useState } from 'react';
 import FileUpload from '../components/FileUpload';
 
 export default function Home() {
