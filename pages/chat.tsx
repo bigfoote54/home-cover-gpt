@@ -1,1 +1,6 @@
-// Placeholder for pages/chat.tsx
+// pages/chat.tsx
+import React from 'react';
+
+export default function ChatPage() {
+  return <div>Chat goes here</div>;
+}
