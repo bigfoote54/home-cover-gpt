@@ -26,7 +26,16 @@ export async function callOpenAI(prompt: string): Promise<string> {
       throw new Error('OpenAI request failed');
     }
   
-    const { choices } = await res.json();
-    return choices[0]?.message?.content?.trim() || '';
+    const data = await res.json();
+    if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+      throw new Error('Invalid response format from OpenAI API');
+    }
+    
+    const content = data.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content received from OpenAI API');
+    }
+    
+    return content.trim();
   }
   

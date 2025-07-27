@@ -37,6 +37,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const buffer = await fs.promises.readFile(uploaded.filepath);
     const { text } = await pdfParse(buffer);
 
+    // Clean up the temporary file
+    try {
+      await fs.promises.unlink(uploaded.filepath);
+    } catch (cleanupErr) {
+      console.warn('Failed to cleanup temporary file:', cleanupErr);
+    }
+
     return res.status(200).json({ text });
   } catch (err) {
     console.error('❌ parse.ts error:', err);
