@@ -21,12 +21,25 @@ export async function callOpenAI(prompt: string): Promise<string> {
     });
   
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({ error: 'Unknown error' }));
       console.error('❌ OpenAI API error:', err);
-      throw new Error('OpenAI request failed');
+      throw new Error(`OpenAI request failed: ${res.status} ${res.statusText}`);
     }
   
-    const { choices } = await res.json();
-    return choices[0]?.message?.content?.trim() || '';
+    const data = await res.json();
+    
+    // Validate response structure
+    if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+      console.error('❌ Invalid OpenAI response structure:', data);
+      throw new Error('Invalid response structure from OpenAI API');
+    }
+    
+    const content = data.choices[0]?.message?.content;
+    if (typeof content !== 'string') {
+      console.error('❌ Invalid message content in OpenAI response:', data.choices[0]);
+      throw new Error('Invalid message content in OpenAI response');
+    }
+    
+    return content.trim();
   }
   

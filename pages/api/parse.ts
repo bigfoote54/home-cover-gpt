@@ -6,11 +6,13 @@ import pdfParse from 'pdf-parse';
 
 export const config = {
   api: {
-    bodyParser: false,  // disable Next’s built‑in parser so formidable can take over
+    bodyParser: false,  // disable Next's built‑in parser so formidable can take over
   },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  let uploadedFilePath: string | null = null;
+  
   try {
     // wrap form.parse in a Promise so we can await it
     const { fields, files } = await new Promise<{
@@ -33,6 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'No file uploaded.' });
     }
 
+    uploadedFilePath = uploaded.filepath;
+
     // read it off disk and extract text
     const buffer = await fs.promises.readFile(uploaded.filepath);
     const { text } = await pdfParse(buffer);
@@ -41,5 +45,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err) {
     console.error('❌ parse.ts error:', err);
     return res.status(500).json({ error: 'Failed to parse PDF.' });
+  } finally {
+    // Clean up the uploaded file to prevent disk space issues
+    if (uploadedFilePath) {
+      try {
+        await fs.promises.unlink(uploadedFilePath);
+      } catch (cleanupErr) {
+        console.warn('⚠️ Failed to clean up uploaded file:', cleanupErr);
+      }
+    }
   }
 }
