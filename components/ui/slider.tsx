@@ -25,4 +25,4 @@ Slider.displayName = SliderPrimitive.Root.displayName
 
 export { Slider }
 
-export default slider;
+export default Slider;

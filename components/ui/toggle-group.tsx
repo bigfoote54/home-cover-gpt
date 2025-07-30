@@ -58,4 +58,4 @@ ToggleGroupItem.displayName = ToggleGroupPrimitive.Item.displayName
 
 export { ToggleGroup, ToggleGroupItem }
 
-export default toggle-group;
+export default ToggleGroup;

@@ -116,4 +116,4 @@ export {
   TableCaption,
 }
 
-export default table;
+export default Table;

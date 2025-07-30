@@ -157,4 +157,4 @@ export {
   SelectScrollDownButton,
 }
 
-export default select;
+export default Select;

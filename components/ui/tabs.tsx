@@ -52,4 +52,4 @@ TabsContent.displayName = TabsPrimitive.Content.displayName
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
 
-export default tabs;
+export default Tabs;

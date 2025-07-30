@@ -27,4 +27,4 @@ TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 
-export default tooltip;
+export default Tooltip;

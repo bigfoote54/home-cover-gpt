@@ -42,4 +42,4 @@ Toggle.displayName = TogglePrimitive.Root.displayName
 
 export { Toggle, toggleVariants }
 
-export default toggle;
+export default Toggle;

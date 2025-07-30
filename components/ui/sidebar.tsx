@@ -758,4 +758,4 @@ export {
   useSidebar,
 }
 
-export default sidebar;
+export default Sidebar;

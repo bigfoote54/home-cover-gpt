@@ -130,4 +130,4 @@ export {
 }
 
 
-export default sheet;
+export default Sheet;

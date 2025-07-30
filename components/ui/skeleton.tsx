@@ -14,4 +14,4 @@ function Skeleton({
 
 export { Skeleton }
 
-export default skeleton;
+export default Skeleton;

@@ -28,4 +28,4 @@ Separator.displayName = SeparatorPrimitive.Root.displayName
 
 export { Separator }
 
-export default separator;
+export default Separator;

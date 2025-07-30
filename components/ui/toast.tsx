@@ -126,4 +126,4 @@ export {
   ToastAction,
 }
 
-export default toast;
+export default Toast;

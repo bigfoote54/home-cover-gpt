@@ -58,4 +58,5 @@ AlertDescription.displayName = "AlertDescription"
 
 export { Alert, AlertTitle, AlertDescription }
 
-export default alert;
+export default Alert;
+""

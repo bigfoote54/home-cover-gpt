@@ -1,3 +1,4 @@
+import React from "react";
 import Header from "@/components/Dashboard/Header";
 import HeroSection from "@/components/Dashboard/HeroSection";
 import FileUpload from "@/components/Dashboard/FileUpload";

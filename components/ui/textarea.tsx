@@ -23,4 +23,4 @@ Textarea.displayName = "Textarea"
 
 export { Textarea }
 
-export default textarea;
+export default Textarea;
