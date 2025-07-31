@@ -1,9 +1,14 @@
 import { useState, useCallback } from "react";
-import { Upload, File, X, CloudUpload, FileText, Loader2 } from "lucide-react";
+import { Upload, File, X, CloudUpload, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { LoadingSpinner, ProcessingSteps } from "@/components/ui/loading-spinner";
+import { ErrorState } from "@/components/ui/error-state";
+import { generateFileHash, getCachedResult, cacheResult, extractTextFromPDF } from "@/lib/parser";
+import { analyzePolicy } from "@/lib/openai";
+import { AnalysisResult } from "@/shared/types";
 
 interface FileUploaderProps {
   onAnalysisComplete?: (results: any) => void;
@@ -16,6 +21,20 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<string>('');
+  type ProcessingStep = {
+    id: string;
+    label: string;
+    status: 'pending' | 'processing' | 'completed' | 'error';
+  };
+
+  const [processingSteps, setProcessingSteps] = useState<ProcessingStep[]>([
+    { id: 'upload', label: 'Uploading file', status: 'pending' },
+    { id: 'extract', label: 'Extracting text', status: 'pending' },
+    { id: 'analyze', label: 'Analyzing policy', status: 'pending' },
+    { id: 'complete', label: 'Generating report', status: 'pending' }
+  ]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -46,62 +65,109 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
     }
   }, [onFileSelect]);
 
-  const handleAnalyze = () => {
+  const resetProcessingState = () => {
+    setError(null);
+    setCurrentStep('');
+    setUploadProgress(0);
+    setProcessingSteps([
+      { id: 'upload', label: 'Uploading file', status: 'pending' },
+      { id: 'extract', label: 'Extracting text', status: 'pending' },
+      { id: 'analyze', label: 'Analyzing policy', status: 'pending' },
+      { id: 'complete', label: 'Generating report', status: 'pending' }
+    ]);
+  };
+
+  const updateStepStatus = (stepId: string, status: 'pending' | 'processing' | 'completed' | 'error') => {
+    setProcessingSteps(prev => 
+      prev.map(step => 
+        step.id === stepId ? { ...step, status } : step
+      )
+    );
+  };
+
+  const handleAnalyze = async () => {
     if (!file || !hasConsented) return;
     
     setIsAnalyzing(true);
-    setUploadProgress(0);
+    setError(null);
+    resetProcessingState();
 
-    // Simulate upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    try {
+      // Step 1: Upload and hash file
+      setCurrentStep('upload');
+      updateStepStatus('upload', 'processing');
+      setUploadProgress(10);
+      
+      const fileHash = await generateFileHash(file);
+      
+      // Check cache first
+      const cachedResult = getCachedResult(fileHash);
+      if (cachedResult) {
+        console.log('📋 Using cached result');
+        updateStepStatus('upload', 'completed');
+        updateStepStatus('extract', 'completed');
+        updateStepStatus('analyze', 'completed');
+        updateStepStatus('complete', 'completed');
+        setUploadProgress(100);
+        setTimeout(() => {
+          setIsAnalyzing(false);
+          onAnalysisComplete?.(cachedResult);
+        }, 500);
+        return;
+      }
 
-    // Simulate analysis
-    setTimeout(() => {
+      updateStepStatus('upload', 'completed');
+      setUploadProgress(25);
+
+      // Step 2: Extract text from PDF
+      setCurrentStep('extract');
+      updateStepStatus('extract', 'processing');
+      setUploadProgress(40);
+      
+      const text = await extractTextFromPDF(file);
+      updateStepStatus('extract', 'completed');
+      setUploadProgress(60);
+
+      // Step 3: Analyze policy
+      setCurrentStep('analyze');
+      updateStepStatus('analyze', 'processing');
+      setUploadProgress(80);
+      
+      const analysisResult = await analyzePolicy(text);
+      updateStepStatus('analyze', 'completed');
+      setUploadProgress(90);
+
+      // Step 4: Complete and cache result
+      setCurrentStep('complete');
+      updateStepStatus('complete', 'processing');
+      setUploadProgress(100);
+      
+      cacheResult(fileHash, analysisResult);
+      updateStepStatus('complete', 'completed');
+      
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        onAnalysisComplete?.(analysisResult);
+      }, 500);
+
+    } catch (err) {
+      console.error('❌ Analysis failed:', err);
+      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
+      
+      // Update current step to error
+      if (currentStep) {
+        updateStepStatus(currentStep, 'error');
+      }
+      
       setIsAnalyzing(false);
-      const mockResults = {
-        coverage: {
-          dwelling: "$750K",
-          personalProperty: "$150K",
-          liability: "$500K"
-        },
-        risks: [
-          {
-            type: "warning",
-            title: "Water Backup Coverage",
-            description: "No coverage detected for water backup incidents"
-          },
-          {
-            type: "error",
-            title: "Replacement Cost Gap",
-            description: "Coverage may be $50K below current replacement cost"
-          }
-        ],
-        recommendations: [
-          {
-            title: "Consider increasing water backup coverage",
-            description: "Add $10K water backup coverage for ~$25/year"
-          },
-          {
-            title: "Update dwelling coverage amount",
-            description: "Consider increasing to $800K based on current market values"
-          }
-        ]
-      };
-      onAnalysisComplete?.(mockResults);
-    }, 3000);
+    }
   };
 
   const removeFile = () => {
     setFile(null);
     setUploadProgress(0);
+    setError(null);
+    resetProcessingState();
   };
 
   return (
@@ -185,14 +251,33 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
                 </Button>
               </div>
 
-              {/* Progress Bar */}
+              {/* Error State */}
+              {error && (
+                <ErrorState
+                  title="Analysis Failed"
+                  message={error}
+                  onRetry={handleAnalyze}
+                  onDismiss={() => setError(null)}
+                  variant="critical"
+                  className="mt-4"
+                />
+              )}
+
+              {/* Progress and Steps */}
               {isAnalyzing && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Analyzing your policy...</span>
-                    <span className="text-foreground font-medium">{uploadProgress}%</span>
+                <div className="space-y-4 mt-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Processing your policy...</span>
+                      <span className="text-foreground font-medium">{uploadProgress}%</span>
+                    </div>
+                    <Progress value={uploadProgress} className="h-2" />
                   </div>
-                  <Progress value={uploadProgress} className="h-2" />
+                  
+                  <ProcessingSteps 
+                    steps={processingSteps} 
+                    currentStep={currentStep}
+                  />
                 </div>
               )}
             </div>
@@ -226,7 +311,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Analyzing Your Coverage...
+                  Processing Your Policy...
                 </>
               ) : (
                 <>
@@ -237,7 +322,10 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
             </Button>
             
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Analysis typically completes in 30 seconds or less
+              {isAnalyzing 
+                ? "Processing large documents may take up to 2 minutes"
+                : "Analysis typically completes in 30 seconds or less"
+              }
             </p>
           </div>
         </CardContent>

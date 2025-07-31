@@ -1,18 +1,46 @@
 import OpenAI from 'openai';
 import { AnalysisResult } from '../shared/types';
+import { chunkText, mergeAnalysisResults } from './parser';
 
-// Initialize OpenAI client with environment variable
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily to avoid build-time issues
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('Missing OPENAI_API_KEY in environment');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 export async function analyzePolicy(text: string): Promise<AnalysisResult> {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('Missing OPENAI_API_KEY in environment');
   }
 
+  // Check if text needs chunking (roughly 12k tokens = 48k characters)
+  const chunks = chunkText(text, 4000);
+  
+  if (chunks.length === 1) {
+    // Single chunk - process normally
+    return await analyzeSingleChunk(chunks[0]);
+  } else {
+    // Multiple chunks - process in parallel and merge results
+    console.log(`📄 Processing ${chunks.length} chunks in parallel...`);
+    const chunkPromises = chunks.map(chunk => analyzeSingleChunk(chunk));
+    const results = await Promise.all(chunkPromises);
+    return mergeAnalysisResults(results);
+  }
+}
+
+async function analyzeSingleChunk(text: string): Promise<AnalysisResult> {
   try {
-    const completion = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const completion = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -102,7 +130,8 @@ export async function callOpenAI(prompt: string): Promise<string> {
   }
 
   try {
-    const completion = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const completion = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: 'You are a helpful assistant.' },
