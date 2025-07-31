@@ -1,6 +1,6 @@
 // pages/api/analyze.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { callOpenAI } from '../../lib/openai';
+import { analyzePolicy } from '../../lib/openai';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -19,17 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // craft your system + user prompt however you like
-    const prompt = `
-You are a homeowners insurance policy expert.
-Please review and explain the following policy text in clear,
-consumer-friendly language:
-
-${text}
-    `.trim();
-
-    const analysis = await callOpenAI(prompt);
-    return res.status(200).json({ analysis });
+    const analysisResult = await analyzePolicy(text);
+    return res.status(200).json({ data: analysisResult });
   } catch (err) {
     console.error('❌ analyze.ts error:', err);
     return res.status(500).json({ error: 'Analysis failed.' });

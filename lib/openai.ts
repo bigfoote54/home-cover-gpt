@@ -1,41 +1,126 @@
-// lib/openai.ts
-export async function callOpenAI(prompt: string): Promise<string> {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('Missing OPENAI_API_KEY in environment');
-    }
-  
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: prompt },
-        ],
-      }),
+import OpenAI from 'openai';
+import { AnalysisResult } from '../shared/types';
+
+// Initialize OpenAI client with environment variable
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function analyzePolicy(text: string): Promise<AnalysisResult> {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OPENAI_API_KEY in environment');
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a homeowners insurance policy expert. Analyze the provided policy text and return a JSON response with the following structure:
+{
+  "coverageSummary": ["summary point 1", "summary point 2", ...],
+  "risks": ["risk 1", "risk 2", ...],
+  "recommendations": ["recommendation 1", "recommendation 2", ...]
+}
+
+Provide clear, consumer-friendly explanations. Focus on key coverage areas, potential gaps or risks, and actionable recommendations for the policyholder.`
+        },
+        {
+          role: 'user',
+          content: `Please analyze this insurance policy text:\n\n${text}`
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
     });
-  
-    if (!res.ok) {
-      const err = await res.json();
-      console.error('❌ OpenAI API error:', err);
-      throw new Error('OpenAI request failed');
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content received from OpenAI API');
     }
-  
-    const data = await res.json();
-    if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-      throw new Error('Invalid response format from OpenAI API');
+
+    // Try to parse as JSON, fallback to structured text parsing if needed
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        coverageSummary: Array.isArray(parsed.coverageSummary) ? parsed.coverageSummary : [],
+        risks: Array.isArray(parsed.risks) ? parsed.risks : [],
+        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+      };
+    } catch (parseError) {
+      // Fallback: extract structured data from text response
+      console.warn('Failed to parse JSON response, attempting text extraction');
+      return extractStructuredData(content);
     }
+  } catch (error) {
+    console.error('❌ OpenAI API error:', error);
+    throw new Error('Policy analysis failed');
+  }
+}
+
+// Fallback function to extract structured data from text response
+function extractStructuredData(text: string): AnalysisResult {
+  const sections = {
+    coverageSummary: [] as string[],
+    risks: [] as string[],
+    recommendations: [] as string[],
+  };
+
+  const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  let currentSection: keyof typeof sections | null = null;
+
+  for (const line of lines) {
+    const lower = line.toLowerCase();
     
-    const content = data.choices[0]?.message?.content;
+    if (lower.includes('coverage') || lower.includes('summary')) {
+      currentSection = 'coverageSummary';
+      continue;
+    } else if (lower.includes('risk') || lower.includes('concern')) {
+      currentSection = 'risks';
+      continue;
+    } else if (lower.includes('recommend') || lower.includes('suggest')) {
+      currentSection = 'recommendations';
+      continue;
+    }
+
+    if (currentSection && line.match(/^[-•*]\s*/) || line.match(/^\d+\.\s*/)) {
+      const cleanedLine = line.replace(/^[-•*]\s*/, '').replace(/^\d+\.\s*/, '').trim();
+      if (cleanedLine.length > 0) {
+        sections[currentSection].push(cleanedLine);
+      }
+    }
+  }
+
+  return sections;
+}
+
+// Legacy function for backward compatibility - delegates to analyzePolicy
+export async function callOpenAI(prompt: string): Promise<string> {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OPENAI_API_KEY in environment');
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
     if (!content) {
       throw new Error('No content received from OpenAI API');
     }
     
     return content.trim();
+  } catch (error) {
+    console.error('❌ OpenAI API error:', error);
+    throw new Error('OpenAI request failed');
   }
+}
   
