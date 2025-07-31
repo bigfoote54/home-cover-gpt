@@ -23,11 +23,17 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<string>('');
-  const [processingSteps, setProcessingSteps] = useState([
-    { id: 'upload', label: 'Uploading file', status: 'pending' as const },
-    { id: 'extract', label: 'Extracting text', status: 'pending' as const },
-    { id: 'analyze', label: 'Analyzing policy', status: 'pending' as const },
-    { id: 'complete', label: 'Generating report', status: 'pending' as const }
+  type ProcessingStep = {
+    id: string;
+    label: string;
+    status: 'pending' | 'processing' | 'completed' | 'error';
+  };
+
+  const [processingSteps, setProcessingSteps] = useState<ProcessingStep[]>([
+    { id: 'upload', label: 'Uploading file', status: 'pending' },
+    { id: 'extract', label: 'Extracting text', status: 'pending' },
+    { id: 'analyze', label: 'Analyzing policy', status: 'pending' },
+    { id: 'complete', label: 'Generating report', status: 'pending' }
   ]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -64,10 +70,10 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
     setCurrentStep('');
     setUploadProgress(0);
     setProcessingSteps([
-      { id: 'upload', label: 'Uploading file', status: 'pending' as const },
-      { id: 'extract', label: 'Extracting text', status: 'pending' as const },
-      { id: 'analyze', label: 'Analyzing policy', status: 'pending' as const },
-      { id: 'complete', label: 'Generating report', status: 'pending' as const }
+      { id: 'upload', label: 'Uploading file', status: 'pending' },
+      { id: 'extract', label: 'Extracting text', status: 'pending' },
+      { id: 'analyze', label: 'Analyzing policy', status: 'pending' },
+      { id: 'complete', label: 'Generating report', status: 'pending' }
     ]);
   };
 
