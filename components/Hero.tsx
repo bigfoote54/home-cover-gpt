@@ -59,10 +59,12 @@ const Hero = ({ onGetStarted }: HeroProps) => {
         <div className="mt-12 animate-scale-in">
           <Button 
             size="lg"
-            className="btn-hero px-8 py-4 text-lg font-semibold rounded-full shadow-glow group"
+            className="btn-hero px-6 py-3 sm:px-8 sm:py-4 text-lg font-semibold rounded-full shadow-glow group transition-all duration-150 ease-in-out"
             onClick={onGetStarted}
+            aria-label="Get my coverage summary"
+            onMouseEnter={() => fetch('/api/parse')}
           >
-            Start Your Analysis
+            Get My Coverage Summary
             <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
           

@@ -2,6 +2,7 @@ import { CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import SkeletonLoader from "@/components/ui/skeleton-loader";
 
 interface CoverageData {
   dwelling: string;
@@ -25,12 +26,21 @@ interface ResultsCardProps {
   risks: RiskItem[];
   recommendations: RecommendationItem[];
   onExportReport?: () => void;
+  isLoading?: boolean;
 }
 
-const ResultsCard = ({ coverage, risks, recommendations, onExportReport }: ResultsCardProps) => {
+const ResultsCard = ({ coverage, risks, recommendations, onExportReport, isLoading }: ResultsCardProps) => {
+  if (isLoading) {
+    return (
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <SkeletonLoader />
+      </section>
+    );
+  }
+
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="space-y-8 animate-slide-up">
+      <div className="space-y-8 animate-slide-up transform scale-95 opacity-0 transition-all duration-300 ease-in-out" style={{ animationDelay: '0.1s' }}>
         {/* Coverage Summary Card */}
         <Card className="card-elevated border-l-4 border-l-success shadow-soft">
           <CardHeader>
@@ -44,22 +54,28 @@ const ResultsCard = ({ coverage, risks, recommendations, onExportReport }: Resul
                   <p className="text-muted-foreground">Analysis completed successfully</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="focus-ring" onClick={onExportReport}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-150 ease-in-out" 
+                onClick={onExportReport}
+                aria-label="Export analysis report"
+              >
                 Export Report
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-success/5 border border-success/20 p-6 rounded-xl text-center">
+              <div className="bg-success/5 border border-success/20 p-6 rounded-xl text-center transition-all duration-150 ease-in-out">
                 <div className="text-3xl font-bold text-success">{coverage.dwelling}</div>
                 <div className="text-sm text-success/80 font-medium">Dwelling Coverage</div>
               </div>
-              <div className="bg-primary/5 border border-primary/20 p-6 rounded-xl text-center">
+              <div className="bg-primary/5 border border-primary/20 p-6 rounded-xl text-center transition-all duration-150 ease-in-out">
                 <div className="text-3xl font-bold text-primary">{coverage.personalProperty}</div>
                 <div className="text-sm text-primary/80 font-medium">Personal Property</div>
               </div>
-              <div className="bg-accent/5 border border-accent/20 p-6 rounded-xl text-center">
+              <div className="bg-accent/5 border border-accent/20 p-6 rounded-xl text-center transition-all duration-150 ease-in-out">
                 <div className="text-3xl font-bold text-accent">{coverage.liability}</div>
                 <div className="text-sm text-accent/80 font-medium">Liability Coverage</div>
               </div>

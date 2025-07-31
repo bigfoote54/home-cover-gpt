@@ -9,6 +9,7 @@ import Footer from "@/components/Dashboard/Footer";
 const Index = () => {
   const [showResults, setShowResults] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGetStarted = () => {
     // Scroll to file uploader or handle navigation
@@ -25,7 +26,7 @@ const Index = () => {
 
   const handleExportReport = () => {
     // Handle export functionality
-    console.log('Exporting report...');
+    // Export functionality would be implemented here
   };
 
   return (

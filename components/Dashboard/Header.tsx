@@ -29,19 +29,22 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               href="/dashboard" 
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus-ring rounded-md px-3 py-2"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded-md px-3 py-2"
+              aria-label="Go to dashboard"
             >
               Dashboard
             </Link>
             <Link 
               href="/analyses" 
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus-ring rounded-md px-3 py-2"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded-md px-3 py-2"
+              aria-label="View past analyses"
             >
               Past Analyses
             </Link>
             <Link 
               href="/settings" 
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus-ring rounded-md px-3 py-2"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded-md px-3 py-2"
+              aria-label="Go to settings"
             >
               Settings
             </Link>

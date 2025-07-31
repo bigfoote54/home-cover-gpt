@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Upload, File, X, CloudUpload, FileText, Loader2, AlertCircle } from "lucide-react";
+import { Upload, File, X, CloudUpload, FileText, Loader2, AlertCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,6 +9,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { generateFileHash, getCachedResult, cacheResult, extractTextFromPDF } from "@/lib/parser";
 import { analyzePolicy } from "@/lib/openai";
 import { AnalysisResult } from "@/shared/types";
+import InfoTooltip from "@/components/ui/info-tooltip";
 
 interface FileUploaderProps {
   onAnalysisComplete?: (results: any) => void;
@@ -35,6 +36,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
     { id: 'analyze', label: 'Analyzing policy', status: 'pending' },
     { id: 'complete', label: 'Generating report', status: 'pending' }
   ]);
+  const [fileValidationError, setFileValidationError] = useState<string | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -49,17 +51,33 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
+    setFileValidationError(null);
     
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type === 'application/pdf') {
+      if (droppedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        setFileValidationError('File too large. Please select a file under 10MB.');
+        return;
+      }
       setFile(droppedFile);
       onFileSelect?.(droppedFile);
+    } else {
+      setFileValidationError('Invalid file type. Please select a PDF file.');
     }
   }, [onFileSelect]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileValidationError(null);
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        setFileValidationError('Invalid file type. Please select a PDF file.');
+        return;
+      }
+      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        setFileValidationError('File too large. Please select a file under 10MB.');
+        return;
+      }
       setFile(selectedFile);
       onFileSelect?.(selectedFile);
     }
@@ -67,6 +85,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
 
   const resetProcessingState = () => {
     setError(null);
+    setFileValidationError(null);
     setCurrentStep('');
     setUploadProgress(0);
     setProcessingSteps([
@@ -103,7 +122,6 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
       // Check cache first
       const cachedResult = getCachedResult(fileHash);
       if (cachedResult) {
-        console.log('📋 Using cached result');
         updateStepStatus('upload', 'completed');
         updateStepStatus('extract', 'completed');
         updateStepStatus('analyze', 'completed');
@@ -151,7 +169,6 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
       }, 500);
 
     } catch (err) {
-      console.error('❌ Analysis failed:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
       
       // Update current step to error
@@ -167,6 +184,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
     setFile(null);
     setUploadProgress(0);
     setError(null);
+    setFileValidationError(null);
     resetProcessingState();
   };
 
@@ -184,7 +202,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
         <CardContent className="p-8">
           {!file ? (
             <div
-              className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer group ${
+              className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-150 ease-in-out cursor-pointer group ${
                 isDragOver 
                   ? 'border-primary bg-primary/5 shadow-glow' 
                   : 'border-border hover:border-primary/50 hover:bg-primary/5'
@@ -192,6 +210,15 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload insurance policy PDF file"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  document.getElementById('file-input')?.click();
+                }
+              }}
             >
               <div className="flex flex-col items-center space-y-6">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
@@ -210,19 +237,27 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
                   </h3>
                   <p className="text-muted-foreground">
                     or{" "}
-                    <label className="text-primary hover:text-primary/80 cursor-pointer underline font-medium focus-ring rounded">
+                    <label className="text-primary hover:text-primary/80 cursor-pointer underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded">
                       browse to upload
                       <input
+                        id="file-input"
                         type="file"
                         accept=".pdf"
                         onChange={handleFileSelect}
                         className="hidden"
+                        aria-label="Select PDF file to upload"
                       />
                     </label>
                   </p>
                   <p className="text-sm text-muted-foreground">
                     PDF files only • Maximum 10MB • Secure processing
                   </p>
+                  
+                  {/* Security messaging with lock icon */}
+                  <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                    <Lock className="w-4 h-4" />
+                    <span>Bank-level security. Data deleted after analysis.</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -245,11 +280,30 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
                   variant="ghost"
                   size="sm"
                   onClick={removeFile}
-                  className="text-muted-foreground hover:text-destructive focus-ring"
+                  className="text-muted-foreground hover:text-destructive focus:outline-none focus:ring-2 focus:ring-accent"
+                  aria-label="Remove uploaded file"
                 >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
+
+              {/* File Validation Error */}
+              {fileValidationError && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm text-red-600 mb-2">{fileValidationError}</p>
+                      <button
+                        onClick={() => setFileValidationError(null)}
+                        className="text-sm text-red-700 underline hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Error State */}
               {error && (
@@ -290,7 +344,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
                 id="consent"
                 checked={hasConsented}
                 onCheckedChange={(checked) => setHasConsented(checked as boolean)}
-                className="mt-1"
+                className="mt-1 focus:outline-none focus:ring-2 focus:ring-accent"
               />
               <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
                 <span className="text-foreground font-medium">Data Processing Consent:</span>{" "}
@@ -298,15 +352,29 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
                 bank-level encryption and completely deleted within 24 hours of analysis.
               </label>
             </div>
+            
+            {/* Info Tooltip */}
+            <InfoTooltip
+              title="Your Data is Secure"
+              description="We use bank-level encryption and automatically delete your data within 24 hours. Your privacy is our top priority."
+              onDismiss={() => {}}
+              className="mt-4"
+            />
           </div>
           
           {/* Analyze Button */}
           <div className="mt-8">
             <Button 
               size="lg"
-              className="w-full btn-hero text-lg font-semibold py-4 rounded-xl group"
+              className="w-full btn-hero text-lg font-semibold py-3 px-6 sm:py-4 sm:px-8 rounded-xl group transition-all duration-150 ease-in-out"
               onClick={handleAnalyze}
               disabled={!file || !hasConsented || isAnalyzing}
+              aria-label={isAnalyzing ? "Processing your policy" : "Run analysis on uploaded policy"}
+              onMouseEnter={() => {
+                if (!isAnalyzing && file && hasConsented) {
+                  fetch('/api/parse');
+                }
+              }}
             >
               {isAnalyzing ? (
                 <>
@@ -316,7 +384,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
               ) : (
                 <>
                   <Upload className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  Analyze My Coverage
+                  Run Analysis →
                 </>
               )}
             </Button>
