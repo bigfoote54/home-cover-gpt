@@ -53,10 +53,6 @@ module.exports = {
         'shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
       },
       backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-hero': 'var(--gradient-hero)',
-        'gradient-success': 'var(--gradient-success)',
-        'gradient-subtle': 'var(--gradient-subtle)',
         'gradient-radial': 'radial-gradient(circle at center, hsl(var(--background)), hsl(var(--muted)))',
         'gradient-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
       },
