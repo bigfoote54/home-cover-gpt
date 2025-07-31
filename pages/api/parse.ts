@@ -5,6 +5,7 @@ import fs from 'fs';
 import pdfParse from 'pdf-parse';
 import { z } from 'zod';
 import { AnalysisResult } from '../../shared/types';
+import { analyzePolicy } from '../../lib/openai';
 
 export const config = {
   api: {
@@ -21,33 +22,6 @@ const fileValidationSchema = z.object({
   ),
   size: z.number().max(5 * 1024 * 1024, 'File size must be less than 5MB'),
 });
-
-// Mock OpenAI analysis function - replace with actual OpenAI integration
-async function analyzePolicy(text: string): Promise<AnalysisResult> {
-  // TODO: Replace this mock implementation with actual OpenAI API call
-  // This is a placeholder implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        coverageSummary: [
-          'Policy covers standard home insurance risks',
-          'Includes dwelling, personal property, and liability coverage',
-          'Deductible amounts vary by coverage type'
-        ],
-        risks: [
-          'Limited coverage for natural disasters',
-          'High deductible for certain claims',
-          'Exclusions for specific personal property items'
-        ],
-        recommendations: [
-          'Consider additional flood insurance',
-          'Review and update coverage limits annually',
-          'Keep detailed inventory of personal property'
-        ]
-      });
-    }, 1000);
-  });
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
