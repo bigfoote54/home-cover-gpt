@@ -1,9 +1,10 @@
 import { useState, useCallback } from "react";
-import { Upload, File, X, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Upload, File, X, AlertCircle, CheckCircle2, CloudUpload, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -11,6 +12,7 @@ const FileUpload = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -43,6 +45,19 @@ const FileUpload = () => {
     if (!file || !hasConsented) return;
     
     setIsAnalyzing(true);
+    setUploadProgress(0);
+
+    // Simulate upload progress
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
     // Simulate analysis
     setTimeout(() => {
       setIsAnalyzing(false);
@@ -52,184 +67,246 @@ const FileUpload = () => {
 
   const removeFile = () => {
     setFile(null);
+    setUploadProgress(0);
   };
 
   if (showResults) {
     return (
-      <div className="space-y-6 animate-slide-up">
-        {/* Coverage Summary Card */}
-        <Card className="shadow-card border-l-4 border-l-success">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                  <h3 className="text-xl font-semibold text-foreground">Your Coverage at a Glance</h3>
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="space-y-8 animate-slide-up">
+          {/* Coverage Summary Card */}
+          <Card className="card-elevated border-l-4 border-l-success shadow-soft">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-success" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Your Coverage at a Glance</CardTitle>
+                    <p className="text-muted-foreground">Analysis completed successfully</p>
+                  </div>
                 </div>
-                <p className="text-muted-foreground">Analysis completed successfully</p>
+                <Button variant="outline" size="sm" className="focus-ring">
+                  Export Report
+                </Button>
               </div>
-              <Button variant="subtle" size="sm">
-                Export Report
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-gradient-success/10 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-success">$750K</div>
-                <div className="text-sm text-success-foreground">Dwelling Coverage</div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-success/5 border border-success/20 p-6 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-success">$750K</div>
+                  <div className="text-sm text-success/80 font-medium">Dwelling Coverage</div>
+                </div>
+                <div className="bg-primary/5 border border-primary/20 p-6 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-primary">$150K</div>
+                  <div className="text-sm text-primary/80 font-medium">Personal Property</div>
+                </div>
+                <div className="bg-accent/5 border border-accent/20 p-6 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-accent">$500K</div>
+                  <div className="text-sm text-accent/80 font-medium">Liability Coverage</div>
+                </div>
               </div>
-              <div className="bg-gradient-primary/10 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-primary">$150K</div>
-                <div className="text-sm text-primary-foreground">Personal Property</div>
-              </div>
-              <div className="bg-accent/10 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-accent">$500K</div>
-                <div className="text-sm text-accent-foreground">Liability Coverage</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Gaps and Risks */}
-        <Card className="shadow-card">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Detected Gaps & Risks</h3>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-warning/10 rounded-lg border-l-4 border-l-warning">
-                <AlertCircle className="w-5 h-5 text-warning mt-0.5" />
-                <div>
+          {/* Gaps and Risks */}
+          <Card className="card-elevated shadow-soft">
+            <CardHeader>
+              <CardTitle className="text-lg">Detected Gaps & Risks</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert className="border-warning/20 bg-warning/5">
+                <AlertCircle className="h-4 w-4 text-warning" />
+                <AlertDescription>
                   <div className="font-medium text-warning-foreground">Water Backup Coverage</div>
-                  <div className="text-sm text-muted-foreground">No coverage detected for water backup incidents</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-destructive/10 rounded-lg border-l-4 border-l-destructive">
-                <AlertCircle className="w-5 h-5 text-destructive mt-0.5" />
-                <div>
+                  <div className="text-sm text-muted-foreground mt-1">No coverage detected for water backup incidents</div>
+                </AlertDescription>
+              </Alert>
+              <Alert className="border-destructive/20 bg-destructive/5">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription>
                   <div className="font-medium text-destructive-foreground">Replacement Cost Gap</div>
-                  <div className="text-sm text-muted-foreground">Coverage may be $50K below current replacement cost</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="text-sm text-muted-foreground mt-1">Coverage may be $50K below current replacement cost</div>
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
 
-        {/* Recommendations */}
-        <Card className="shadow-card">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Recommendations</h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-success mt-0.5" />
+          {/* Recommendations */}
+          <Card className="card-elevated shadow-soft">
+            <CardHeader>
+              <CardTitle className="text-lg">Recommendations</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3 p-4 bg-success/5 rounded-lg border border-success/20">
+                <CheckCircle2 className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-foreground">Consider increasing water backup coverage</div>
                   <div className="text-sm text-muted-foreground">Add $10K water backup coverage for ~$25/year</div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-success mt-0.5" />
+              <div className="flex items-start gap-3 p-4 bg-success/5 rounded-lg border border-success/20">
+                <CheckCircle2 className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-foreground">Update dwelling coverage amount</div>
                   <div className="text-sm text-muted-foreground">Consider increasing to $800K based on current market values</div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Disclaimer */}
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Important:</strong> This analysis is for informational purposes only and does not constitute legal or insurance advice. 
-            Please consult with your insurance agent or a qualified professional for specific coverage recommendations.
-          </AlertDescription>
-        </Alert>
-      </div>
+          {/* Disclaimer */}
+          <Alert className="bg-muted/30 border-border">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Important:</strong> This analysis is for informational purposes only and does not constitute legal or insurance advice. 
+              Please consult with your insurance agent or a qualified professional for specific coverage recommendations.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </section>
     );
   }
 
   return (
-    <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-8 max-w-3xl mx-auto my-16">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Upload Your Insurance Policy</h2>
-      {!file ? (
-        <div
-          className={`w-full border-2 border-dashed ${
-            isDragOver 
-              ? 'border-teal-400' 
-              : 'border-gray-300 hover:border-teal-400'
-          } rounded-lg p-6 flex flex-col items-center justify-center text-gray-500 cursor-pointer transition`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <Upload className="w-12 h-12 text-gray-400 mb-4" />
-          <div className="text-center space-y-2">
-            <p className="text-lg font-medium text-gray-700">
-              Drop your insurance PDF here
-            </p>
-            <p className="text-gray-500">
-              or{" "}
-              <label className="text-teal-500 hover:text-teal-600 cursor-pointer underline">
-                browse to upload
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-              </label>
-            </p>
-            <p className="text-sm text-gray-400">
-              PDF files only, max 10MB
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* File Preview */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-            <div className="flex items-center gap-3">
-              <File className="w-8 h-8 text-teal-500" />
-              <div>
-                <div className="font-medium text-gray-800">{file.name}</div>
-                <div className="text-sm text-gray-500">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB
+    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-foreground mb-4">Upload Your Insurance Policy</h2>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Drag and drop your homeowners insurance PDF below, or click to browse your files. 
+          We'll analyze it instantly and provide actionable insights.
+        </p>
+      </div>
+
+      <Card className="card-elevated shadow-soft">
+        <CardContent className="p-8">
+          {!file ? (
+            <div
+              className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer group ${
+                isDragOver 
+                  ? 'border-primary bg-primary/5 shadow-glow' 
+                  : 'border-border hover:border-primary/50 hover:bg-primary/5'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="flex flex-col items-center space-y-6">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isDragOver 
+                    ? 'bg-primary/20 scale-110' 
+                    : 'bg-muted group-hover:bg-primary/10 group-hover:scale-105'
+                }`}>
+                  <CloudUpload className={`w-8 h-8 transition-colors duration-300 ${
+                    isDragOver ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
+                  }`} />
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Drop your insurance PDF here
+                  </h3>
+                  <p className="text-muted-foreground">
+                    or{" "}
+                    <label className="text-primary hover:text-primary/80 cursor-pointer underline font-medium focus-ring rounded">
+                      browse to upload
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </label>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    PDF files only • Maximum 10MB • Secure processing
+                  </p>
                 </div>
               </div>
             </div>
-            <button
-              onClick={removeFile}
-              className="p-2 text-gray-400 hover:text-gray-600 transition"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          ) : (
+            <div className="space-y-6">
+              {/* File Preview */}
+              <div className="flex items-center justify-between p-6 bg-muted/30 rounded-xl border border-border">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">{file.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB • PDF Document
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeFile}
+                  className="text-muted-foreground hover:text-destructive focus-ring"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {/* Progress Bar */}
+              {isAnalyzing && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Analyzing your policy...</span>
+                    <span className="text-foreground font-medium">{uploadProgress}%</span>
+                  </div>
+                  <Progress value={uploadProgress} className="h-2" />
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Consent Checkbox */}
+          <div className="mt-8 p-6 bg-muted/20 rounded-xl border border-border/50">
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="consent"
+                checked={hasConsented}
+                onCheckedChange={(checked) => setHasConsented(checked as boolean)}
+                className="mt-1"
+              />
+              <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                <span className="text-foreground font-medium">Data Processing Consent:</span>{" "}
+                I consent to have my document analyzed by AI. My data will be processed securely using 
+                bank-level encryption and completely deleted within 24 hours of analysis.
+              </label>
+            </div>
           </div>
-        </div>
-      )}
-      
-      <label className="mt-4 flex items-center space-x-2 text-gray-700">
-        <input 
-          type="checkbox" 
-          className="h-5 w-5 text-teal-400"
-          checked={hasConsented}
-          onChange={(e) => setHasConsented(e.target.checked)}
-        />
-        <span>I consent to have my document analyzed by AI. My data will be processed securely and deleted after analysis.</span>
-      </label>
-      
-      <button 
-        className="mt-6 w-full bg-gradient-to-r from-teal-400 to-blue-600 hover:from-teal-500 hover:to-blue-700 text-white py-3 rounded-lg font-medium transition"
-        onClick={handleAnalyze}
-        disabled={!file || !hasConsented || isAnalyzing}
-      >
-        {isAnalyzing ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block" />
-            Analyzing...
-          </>
-        ) : (
-          'Analyze My Coverage'
-        )}
-      </button>
+          
+          {/* Analyze Button */}
+          <div className="mt-8">
+            <Button 
+              size="lg"
+              className="w-full btn-hero text-lg font-semibold py-4 rounded-xl group"
+              onClick={handleAnalyze}
+              disabled={!file || !hasConsented || isAnalyzing}
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Analyzing Your Coverage...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Analyze My Coverage
+                </>
+              )}
+            </Button>
+            
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Analysis typically completes in 30 seconds or less
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 };

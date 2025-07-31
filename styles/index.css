@@ -8,53 +8,55 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Trustworthy blue-green palette */
-    --background: 210 20% 98%;
+    /* Modern trustworthy blue-teal palette */
+    --background: 210 40% 98%; /* #F8FAFC - Light gray background */
     --foreground: 215 25% 27%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* Pure white cards */
     --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    --primary: 205 87% 21%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 217 91% 60%; /* #3B82F6 - Soft blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 197 37% 96%;
-    --secondary-foreground: 205 87% 21%;
+    --secondary: 210 40% 95%;
+    --secondary-foreground: 217 91% 60%;
 
-    --muted: 197 37% 96%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 158 64% 52%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 158 64% 52%; /* #10B981 - Teal */
+    --accent-foreground: 0 0% 100%;
 
-    --success: 158 64% 52%;
-    --success-foreground: 210 20% 98%;
+    --success: 158 64% 52%; /* #10B981 - Teal */
+    --success-foreground: 0 0% 100%;
 
     --warning: 43 96% 56%;
     --warning-foreground: 215 25% 27%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 205 87% 21%;
+    --ring: 217 91% 60%;
 
-    /* Custom design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(205 87% 21%), hsl(197 71% 40%));
+    /* Custom design tokens - Blue to Teal gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(158 64% 52%)); /* Blue to Teal */
     --gradient-success: linear-gradient(135deg, hsl(158 64% 52%), hsl(142 76% 36%));
-    --gradient-subtle: linear-gradient(180deg, hsl(210 20% 98%), hsl(197 37% 96%));
+    --gradient-subtle: linear-gradient(180deg, hsl(210 40% 98%), hsl(210 40% 96%)); /* Subtle background gradient */
+    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(158 64% 52%) 100%); /* Primary gradient for hero elements */
     
-    --shadow-soft: 0 4px 20px -2px hsl(205 87% 21% / 0.1);
-    --shadow-card: 0 2px 12px -2px hsl(205 87% 21% / 0.08);
-    --shadow-glow: 0 0 30px hsl(158 64% 52% / 0.2);
+    --shadow-soft: 0 4px 20px -2px hsl(217 91% 60% / 0.08);
+    --shadow-card: 0 2px 12px -2px hsl(217 91% 60% / 0.05), 0 1px 3px hsl(217 91% 60% / 0.1);
+    --shadow-glow: 0 0 30px hsl(158 64% 52% / 0.15);
+    --shadow-hover: 0 8px 30px -6px hsl(217 91% 60% / 0.15);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly more rounded corners */
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -76,7 +78,7 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 217 91% 60%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -85,7 +87,7 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 158 64% 52%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -93,7 +95,7 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 217 91% 60%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -111,7 +113,12 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-subtle text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-balance;
   }
 }
 
@@ -134,31 +141,35 @@ All colors MUST be HSL.
     backdrop-filter: blur(2px);
   }
   
-  /* Custom focus styles */
+  /* Custom focus styles for accessibility */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
   
   /* Custom button variants */
   .btn-hero {
-    @apply bg-gradient-primary text-primary-foreground hover:shadow-glow transform hover:scale-105 font-semibold;
+    @apply bg-gradient-hero text-white hover:shadow-hover transform hover:scale-105 font-semibold transition-all duration-300 focus-ring;
   }
   
   .btn-success {
-    @apply bg-gradient-success text-success-foreground hover:shadow-glow transform hover:scale-105;
+    @apply bg-gradient-success text-white hover:shadow-glow transform hover:scale-105 transition-all duration-300 focus-ring;
   }
   
   .btn-premium {
-    @apply bg-gradient-primary text-primary-foreground border-2 border-accent/30 hover:border-accent/50 shadow-glow transform hover:scale-105;
+    @apply bg-gradient-primary text-white border-2 border-accent/30 hover:border-accent/50 shadow-glow transform hover:scale-105 transition-all duration-300 focus-ring;
   }
   
   /* Custom card styles */
   .card-elevated {
-    @apply shadow-card hover:shadow-soft transition-all duration-300;
+    @apply shadow-card hover:shadow-soft transition-all duration-300 bg-card border-0;
   }
   
   .card-glass {
-    @apply bg-background/60 backdrop-blur border border-border/50;
+    @apply bg-card/60 backdrop-blur border border-border/50;
+  }
+
+  .card-hover {
+    @apply hover:shadow-hover hover:-translate-y-1 transition-all duration-300;
   }
   
   /* Custom animation utilities */
@@ -169,13 +180,49 @@ All colors MUST be HSL.
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
   
-  /* Custom spacing utilities */
+  /* Custom spacing utilities for 24px grid system */
   .space-y-18 > * + * {
     margin-top: 4.5rem;
   }
   
   .space-x-18 > * + * {
     margin-left: 4.5rem;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1.5rem; /* 24px */
+  }
+
+  .space-y-12 > * + * {
+    margin-top: 3rem; /* 48px */
+  }
+
+  /* Custom background patterns */
+  .bg-dot-pattern {
+    background-image: radial-gradient(circle, hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, hsl(var(--background)), hsl(var(--muted)));
+  }
+}
+
+@layer components {
+  /* Scale-in animation for cards and interactive elements */
+  @keyframes scaleIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
