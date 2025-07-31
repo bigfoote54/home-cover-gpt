@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { AnalysisResult } from '../shared/types';
+import { chunkText, mergeAnalysisResults } from './parser';
 
 // Initialize OpenAI client with environment variable
 const openai = new OpenAI({
@@ -11,6 +12,22 @@ export async function analyzePolicy(text: string): Promise<AnalysisResult> {
     throw new Error('Missing OPENAI_API_KEY in environment');
   }
 
+  // Check if text needs chunking (roughly 12k tokens = 48k characters)
+  const chunks = chunkText(text, 4000);
+  
+  if (chunks.length === 1) {
+    // Single chunk - process normally
+    return await analyzeSingleChunk(chunks[0]);
+  } else {
+    // Multiple chunks - process in parallel and merge results
+    console.log(`📄 Processing ${chunks.length} chunks in parallel...`);
+    const chunkPromises = chunks.map(chunk => analyzeSingleChunk(chunk));
+    const results = await Promise.all(chunkPromises);
+    return mergeAnalysisResults(results);
+  }
+}
+
+async function analyzeSingleChunk(text: string): Promise<AnalysisResult> {
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
