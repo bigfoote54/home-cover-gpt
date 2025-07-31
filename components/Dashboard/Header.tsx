@@ -1,4 +1,6 @@
 import { Shield, Menu, User, Settings } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,12 +10,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
+  const router = useRouter();
+
+  const isActive = (path: string) => {
+    return router.pathname === path;
+  };
+
   return (
     <header className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-primary-foreground" />
             </div>
@@ -21,19 +29,34 @@ const Header = () => {
               <span className="text-lg font-bold text-foreground">Home Cover GPT</span>
               <span className="text-xs text-muted-foreground hidden sm:block">Insurance made simple</span>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Button variant="ghost" className="text-sm font-medium">
-              Dashboard
-            </Button>
-            <Button variant="ghost" className="text-sm font-medium">
-              Past Analyses
-            </Button>
-            <Button variant="ghost" className="text-sm font-medium">
-              Settings
-            </Button>
+            <Link href="/dashboard">
+              <Button 
+                variant={isActive("/dashboard") ? "default" : "ghost"} 
+                className="text-sm font-medium"
+              >
+                Dashboard
+              </Button>
+            </Link>
+            <Link href="/analyses">
+              <Button 
+                variant={isActive("/analyses") ? "default" : "ghost"} 
+                className="text-sm font-medium"
+              >
+                Past Analyses
+              </Button>
+            </Link>
+            <Link href="/settings">
+              <Button 
+                variant={isActive("/settings") ? "default" : "ghost"} 
+                className="text-sm font-medium"
+              >
+                Settings
+              </Button>
+            </Link>
           </nav>
 
           {/* User Menu */}
@@ -49,13 +72,17 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Shield className="w-4 h-4 mr-2" />
@@ -72,9 +99,18 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                <DropdownMenuItem>Past Analyses</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/analyses">Past Analyses</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Button variant="premium" size="sm" className="w-full">
                     Upgrade

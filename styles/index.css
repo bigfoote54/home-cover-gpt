@@ -57,19 +57,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -119,5 +112,70 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Custom utility classes */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .backdrop-blur-xs {
+    backdrop-filter: blur(2px);
+  }
+  
+  /* Custom focus styles */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+  
+  /* Custom button variants */
+  .btn-hero {
+    @apply bg-gradient-primary text-primary-foreground hover:shadow-glow transform hover:scale-105 font-semibold;
+  }
+  
+  .btn-success {
+    @apply bg-gradient-success text-success-foreground hover:shadow-glow transform hover:scale-105;
+  }
+  
+  .btn-premium {
+    @apply bg-gradient-primary text-primary-foreground border-2 border-accent/30 hover:border-accent/50 shadow-glow transform hover:scale-105;
+  }
+  
+  /* Custom card styles */
+  .card-elevated {
+    @apply shadow-card hover:shadow-soft transition-all duration-300;
+  }
+  
+  .card-glass {
+    @apply bg-background/60 backdrop-blur border border-border/50;
+  }
+  
+  /* Custom animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  /* Custom spacing utilities */
+  .space-y-18 > * + * {
+    margin-top: 4.5rem;
+  }
+  
+  .space-x-18 > * + * {
+    margin-left: 4.5rem;
   }
 }
