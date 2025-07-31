@@ -3,12 +3,51 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import fs from 'fs';
 import pdfParse from 'pdf-parse';
+import { z } from 'zod';
+import { AnalysisResult } from '../../shared/types';
 
 export const config = {
   api: {
-    bodyParser: false,  // disable Next’s built‑in parser so formidable can take over
+    bodyParser: false,  // disable Next's built‑in parser so formidable can take over
   },
 };
+
+// Zod schema for file validation
+const fileValidationSchema = z.object({
+  filepath: z.string(),
+  mimetype: z.string().refine(
+    (mime) => mime === 'application/pdf',
+    { message: 'Only PDF files are allowed' }
+  ),
+  size: z.number().max(5 * 1024 * 1024, 'File size must be less than 5MB'),
+});
+
+// Mock OpenAI analysis function - replace with actual OpenAI integration
+async function analyzePolicy(text: string): Promise<AnalysisResult> {
+  // TODO: Replace this mock implementation with actual OpenAI API call
+  // This is a placeholder implementation
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        coverageSummary: [
+          'Policy covers standard home insurance risks',
+          'Includes dwelling, personal property, and liability coverage',
+          'Deductible amounts vary by coverage type'
+        ],
+        risks: [
+          'Limited coverage for natural disasters',
+          'High deductible for certain claims',
+          'Exclusions for specific personal property items'
+        ],
+        recommendations: [
+          'Consider additional flood insurance',
+          'Review and update coverage limits annually',
+          'Keep detailed inventory of personal property'
+        ]
+      });
+    }, 1000);
+  });
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -20,6 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const form = formidable({
         multiples: false,
         keepExtensions: true,
+        maxFileSize: 5 * 1024 * 1024, // 5MB limit
       });
       form.parse(req, (err, fields, files) => {
         if (err) return reject(err);
@@ -33,6 +73,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'No file uploaded.' });
     }
 
+    // Validate the uploaded file using Zod
+    try {
+      fileValidationSchema.parse({
+        filepath: uploaded.filepath,
+        mimetype: uploaded.mimetype || '',
+        size: uploaded.size || 0,
+      });
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: `File validation failed: ${validationError.errors.map(e => e.message).join(', ')}` 
+        });
+      }
+      return res.status(400).json({ error: 'File validation failed' });
+    }
+
     // read it off disk and extract text
     const buffer = await fs.promises.readFile(uploaded.filepath);
     const { text } = await pdfParse(buffer);
@@ -44,7 +100,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.warn('Failed to cleanup temporary file:', cleanupErr);
     }
 
-    return res.status(200).json({ text });
+    // Analyze the policy text and return structured result
+    const analysisResult = await analyzePolicy(text);
+    
+    return res.status(200).json({ data: analysisResult });
   } catch (err) {
     console.error('❌ parse.ts error:', err);
     return res.status(500).json({ error: 'Failed to parse PDF.' });
