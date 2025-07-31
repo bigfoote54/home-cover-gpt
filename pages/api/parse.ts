@@ -6,13 +6,16 @@ import pdfParse from 'pdf-parse';
 
 export const config = {
   api: {
+<<<<<<< HEAD
     bodyParser: false,  // disable Next's built‑in parser so formidable can take over
+=======
+    bodyParser: false,  // disable Next’s built‑in parser so formidable can take over
+>>>>>>> origin/main
   },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   let uploadedFilePath: string | null = null;
-  
   try {
     // wrap form.parse in a Promise so we can await it
     const { fields, files } = await new Promise<{
@@ -36,11 +39,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     uploadedFilePath = uploaded.filepath;
-
     // read it off disk and extract text
     const buffer = await fs.promises.readFile(uploaded.filepath);
     const { text } = await pdfParse(buffer);
-
     return res.status(200).json({ text });
   } catch (err) {
     console.error('❌ parse.ts error:', err);

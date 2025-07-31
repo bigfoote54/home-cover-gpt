@@ -5,10 +5,12 @@ export default function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   const uploadFile = async () => {
     if (!file) return;
     setUploading(true);
+    setError('');
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -20,10 +22,14 @@ export default function FileUpload() {
 
       // analyze endpoint
       const analyzeRes = await axios.post('/api/analyze', { text });
+      if (!analyzeRes.data.analysis) {
+        throw new Error('No analysis received from server');
+      }
       setAnalysis(analyzeRes.data.analysis as string);
     } catch (err) {
       console.error(err);
-      alert('An error occurred during upload or analysis.');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during upload or analysis.';
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -44,6 +50,13 @@ export default function FileUpload() {
       >
         {uploading ? 'Uploading...' : 'Upload and Analyze'}
       </button>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-700">
+          <h2 className="font-bold mb-2">Error</h2>
+          <p>{error}</p>
+        </div>
+      )}
 
       {analysis && (
         <div className="mt-4 p-4 bg-white shadow rounded whitespace-pre-wrap text-sm">

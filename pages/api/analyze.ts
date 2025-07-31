@@ -13,6 +13,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'No text provided for analysis.' });
   }
 
+  // Validate text length to prevent issues with OpenAI API
+  if (text.length > 100000) {
+    return res.status(400).json({ error: 'Text is too long for analysis. Please upload a smaller document.' });
+  }
   try {
     // craft your system + user prompt however you like
     const prompt = `

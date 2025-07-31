@@ -1,5 +1,7 @@
 .env
 .env.*
 !.env.example
+!.env.local.example
 .env.local
-.env.local
+.next/
+node_modules/

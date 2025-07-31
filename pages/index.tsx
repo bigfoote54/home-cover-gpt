@@ -1,13 +1,22 @@
-import FileUpload from '../components/FileUpload';
+import React from "react";
+import Header from "@/components/Dashboard/Header";
+import HeroSection from "@/components/Dashboard/HeroSection";
+import FileUpload from "@/components/Dashboard/FileUpload";
+import Testimonials from "@/components/Dashboard/Testimonials";
+import Footer from "@/components/Dashboard/Footer";
 
-export default function Home() {
+const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-100">
-      <h1 className="text-4xl font-bold mb-4">Home Cover GPT</h1>
-      <p className="mb-6 text-center max-w-xl">
-        Upload your homeowners insurance policy and get GPT-powered recommendations.
-      </p>
-      <FileUpload />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <HeroSection />
+        <FileUpload />
+        <Testimonials />
+      </main>
+      <Footer />
     </div>
   );
-}
+};
+
+export default Index;
