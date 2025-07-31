@@ -59,7 +59,7 @@ const Testimonials = () => {
             What homeowners are saying
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of satisfied homeowners who've gained clarity and saved money 
+            Join thousands of satisfied homeowners who&apos;ve gained clarity and saved money 
             with our AI-powered insurance analysis.
           </p>
         </div>
@@ -85,7 +85,7 @@ const Testimonials = () => {
 
                 {/* Testimonial Content */}
                 <blockquote className="text-muted-foreground leading-relaxed mb-6 italic">
-                  "{testimonial.content}"
+                  &ldquo;{testimonial.content}&rdquo;
                 </blockquote>
 
                 {/* User Info */}

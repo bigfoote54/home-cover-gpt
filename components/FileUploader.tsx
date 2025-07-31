@@ -110,7 +110,7 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
         <h2 className="text-3xl font-bold text-foreground mb-4">Upload Your Insurance Policy</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Drag and drop your homeowners insurance PDF below, or click to browse your files. 
-          We'll analyze it instantly and provide actionable insights.
+          We&apos;ll analyze it instantly and provide actionable insights.
         </p>
       </div>
 
