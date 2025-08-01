@@ -160,11 +160,14 @@ const AnalysesPage = () => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => window.location.href = `/analyses/${analysis.id}`}>
                       <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      console.log(`Downloading analysis: ${analysis.title}`);
+                      alert(`Download started for ${analysis.title}`);
+                    }}>
                       <Download className="w-4 h-4 mr-1" />
                       Download
                     </Button>

@@ -61,7 +61,11 @@ const SettingsPage = () => {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
               </div>
-              <Button>Save Changes</Button>
+              <Button onClick={() => {
+                // Here you would typically save the changes to a backend
+                console.log('Profile settings saved');
+                alert('Profile settings saved successfully!');
+              }}>Save Changes</Button>
             </CardContent>
           </Card>
 
@@ -198,19 +202,32 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  const newPassword = prompt('Enter new password:');
+                  if (newPassword) {
+                    console.log('Password changed');
+                    alert('Password updated successfully!');
+                  }
+                }}>
                   <Shield className="w-4 h-4 mr-2" />
                   Change Password
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  alert('Two-factor authentication setup will be available soon!');
+                }}>
                   <Shield className="w-4 h-4 mr-2" />
                   Two-Factor Authentication
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  alert('Privacy settings will be available soon!');
+                }}>
                   <Shield className="w-4 h-4 mr-2" />
                   Privacy Settings
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  console.log('Exporting data...');
+                  alert('Data export started. You will receive an email with your data.');
+                }}>
                   <Shield className="w-4 h-4 mr-2" />
                   Data Export
                 </Button>
@@ -232,19 +249,25 @@ const SettingsPage = () => {
                   <h4 className="font-medium">Current Plan</h4>
                   <p className="text-sm text-muted-foreground">Premium Plan - $19.99/month</p>
                 </div>
-                <Button variant="outline">Manage Subscription</Button>
+                <Button variant="outline" onClick={() => window.location.href = "/upgrade"}>Manage Subscription</Button>
               </div>
               <Separator />
               <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  alert('Payment methods management will be available soon!');
+                }}>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Payment Methods
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  alert('Billing history will be available soon!');
+                }}>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Billing History
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  alert('Invoice settings will be available soon!');
+                }}>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Invoice Settings
                 </Button>

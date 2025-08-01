@@ -104,7 +104,7 @@ const DashboardPage = () => {
                       <p className="text-sm text-muted-foreground">{analysis.type} • {analysis.date}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => window.location.href = `/analyses/${analysis.id}`}>
                     View Details
                   </Button>
                 </div>
@@ -117,19 +117,19 @@ const DashboardPage = () => {
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button className="h-20 flex-col gap-2" variant="outline">
+            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/"}>
               <FileText className="w-6 h-6" />
               <span>New Analysis</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline">
+            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/analyses"}>
               <CheckCircle className="w-6 h-6" />
               <span>Review Policies</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline">
+            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/profile"}>
               <Clock className="w-6 h-6" />
               <span>Check Renewals</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline">
+            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/upgrade"}>
               <AlertCircle className="w-6 h-6" />
               <span>Get Quotes</span>
             </Button>

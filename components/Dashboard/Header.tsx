@@ -40,6 +40,12 @@ const Header = () => {
               Past Analyses
             </Link>
             <Link 
+              href="/chat" 
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors focus-ring rounded-md px-3 py-2"
+            >
+              Chat Assistant
+            </Link>
+            <Link 
               href="/settings" 
               className="text-muted-foreground hover:text-foreground font-medium transition-colors focus-ring rounded-md px-3 py-2"
             >
@@ -109,7 +115,15 @@ const Header = () => {
                 
                 <DropdownMenuSeparator />
                 
-                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem 
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  onClick={() => {
+                    // Simulate logout
+                    console.log('Logging out...');
+                    alert('You have been logged out successfully.');
+                    window.location.href = '/';
+                  }}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

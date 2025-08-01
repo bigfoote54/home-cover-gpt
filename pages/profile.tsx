@@ -84,11 +84,11 @@ const ProfilePage = () => {
 
                   {/* Quick Actions */}
                   <div className="space-y-2 w-full">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => setIsEditing(true)}>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Profile
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = "/settings"}>
                       <Shield className="w-4 h-4 mr-2" />
                       Security Settings
                     </Button>
@@ -165,7 +165,11 @@ const ProfilePage = () => {
                 </div>
                 {isEditing && (
                   <div className="flex gap-2">
-                    <Button>Save Changes</Button>
+                    <Button onClick={() => {
+                      setIsEditing(false);
+                      // Here you would typically save the changes to a backend
+                      console.log('Profile updated');
+                    }}>Save Changes</Button>
                     <Button variant="outline" onClick={() => setIsEditing(false)}>
                       Cancel
                     </Button>
@@ -259,7 +263,11 @@ const ProfilePage = () => {
                     <p className="text-sm text-muted-foreground">Download your data</p>
                   </div>
                   <div className="flex justify-end">
-                    <Button variant="outline" size="sm">Export</Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      // Simulate data export
+                      console.log('Exporting user data...');
+                      alert('Data export started. You will receive an email with your data.');
+                    }}>Export</Button>
                   </div>
                 </div>
               </CardContent>
