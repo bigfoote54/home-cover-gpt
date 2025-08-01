@@ -252,7 +252,7 @@ Home Cover GPT`;
             <div className="border border-border rounded-lg p-4 bg-background">
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>From: Home Cover GPT <noreply@homecovergpt.com></span>
+                  <span>From: Home Cover GPT &lt;noreply@homecovergpt.com&gt;</span>
                   <span>{new Date().toLocaleDateString()}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
