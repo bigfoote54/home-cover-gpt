@@ -1,4 +1,5 @@
 // pages/api/parse.ts
+console.log('🔑 OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
 import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -80,6 +81,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ data: analysisResult });
   } catch (err) {
     console.error('❌ parse.ts error:', err);
+    
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) {
+      console.error('❌ OPENAI_API_KEY is undefined or empty');
+      return res.status(500).json({ error: 'Server misconfiguration: no API key found.' });
+    }
+    
     return res.status(500).json({ error: 'Failed to parse PDF.' });
   }
 }
