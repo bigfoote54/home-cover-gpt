@@ -26,6 +26,7 @@ const Index = () => {
   const handleExportReport = () => {
     // Handle export functionality
     console.log('Exporting report...');
+    alert('Report export started! You will receive an email with your analysis report.');
   };
 
   return (
