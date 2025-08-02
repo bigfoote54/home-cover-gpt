@@ -6,16 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner, ProcessingSteps } from "@/components/ui/loading-spinner";
 import { ErrorState } from "@/components/ui/error-state";
-import { generateFileHash, getCachedResult, cacheResult, extractTextFromPDF } from "@/lib/parser";
-import { analyzePolicy } from "@/lib/openai";
 import { AnalysisResult } from "@/shared/types";
 
 interface FileUploaderProps {
-  onAnalysisComplete?: (results: any) => void;
-  onFileSelect?: (file: File) => void;
+  onAnalyze?: (file: File) => Promise<AnalysisResult>;
 }
 
-const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) => {
+const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -53,17 +50,15 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type === 'application/pdf') {
       setFile(droppedFile);
-      onFileSelect?.(droppedFile);
     }
-  }, [onFileSelect]);
+  }, []);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      onFileSelect?.(selectedFile);
     }
-  }, [onFileSelect]);
+  }, []);
 
   const resetProcessingState = () => {
     setError(null);
@@ -86,68 +81,40 @@ const FileUploader = ({ onAnalysisComplete, onFileSelect }: FileUploaderProps) =
   };
 
   const handleAnalyze = async () => {
-    if (!file || !hasConsented) return;
+    if (!file || !hasConsented || !onAnalyze) return;
     
     setIsAnalyzing(true);
     setError(null);
     resetProcessingState();
 
     try {
-      // Step 1: Upload and hash file
+      // Step 1: Upload and process
       setCurrentStep('upload');
       updateStepStatus('upload', 'processing');
-      setUploadProgress(10);
-      
-      const fileHash = await generateFileHash(file);
-      
-      // Check cache first
-      const cachedResult = getCachedResult(fileHash);
-      if (cachedResult) {
-        console.log('📋 Using cached result');
-        updateStepStatus('upload', 'completed');
-        updateStepStatus('extract', 'completed');
-        updateStepStatus('analyze', 'completed');
-        updateStepStatus('complete', 'completed');
-        setUploadProgress(100);
-        setTimeout(() => {
-          setIsAnalyzing(false);
-          onAnalysisComplete?.(cachedResult);
-        }, 500);
-        return;
-      }
-
-      updateStepStatus('upload', 'completed');
       setUploadProgress(25);
-
-      // Step 2: Extract text from PDF
-      setCurrentStep('extract');
+      
+      updateStepStatus('upload', 'completed');
       updateStepStatus('extract', 'processing');
-      setUploadProgress(40);
-      
-      const text = await extractTextFromPDF(file);
-      updateStepStatus('extract', 'completed');
-      setUploadProgress(60);
+      setUploadProgress(50);
 
-      // Step 3: Analyze policy
-      setCurrentStep('analyze');
+      // Step 2: Extract and analyze
+      updateStepStatus('extract', 'completed');
       updateStepStatus('analyze', 'processing');
-      setUploadProgress(80);
+      setUploadProgress(75);
       
-      const analysisResult = await analyzePolicy(text);
+      const analysisResult = await onAnalyze(file);
       updateStepStatus('analyze', 'completed');
       setUploadProgress(90);
 
-      // Step 4: Complete and cache result
+      // Step 3: Complete
       setCurrentStep('complete');
       updateStepStatus('complete', 'processing');
       setUploadProgress(100);
       
-      cacheResult(fileHash, analysisResult);
       updateStepStatus('complete', 'completed');
       
       setTimeout(() => {
         setIsAnalyzing(false);
-        onAnalysisComplete?.(analysisResult);
       }, 500);
 
     } catch (err) {

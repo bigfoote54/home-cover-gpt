@@ -5,10 +5,11 @@ import FileUploader from "@/components/FileUploader";
 import ResultsCard from "@/components/ResultsCard";
 import Testimonials from "@/components/Dashboard/Testimonials";
 import Footer from "@/components/Dashboard/Footer";
+import { AnalysisResult } from "@/shared/types";
 
 const Index = () => {
   const [showResults, setShowResults] = useState(false);
-  const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const handleGetStarted = () => {
     // Scroll to file uploader or handle navigation
@@ -18,9 +19,27 @@ const Index = () => {
     }
   };
 
-  const handleAnalysisComplete = (results: any) => {
-    setAnalysisResults(results);
+  const handleAnalyze = async (file: File): Promise<AnalysisResult> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/parse', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Analysis failed');
+    }
+
+    const data = await response.json();
+    const result = data.data as AnalysisResult;
+    
+    setAnalysisResult(result);
     setShowResults(true);
+    
+    return result;
   };
 
   const handleExportReport = () => {
@@ -36,14 +55,14 @@ const Index = () => {
         <Hero onGetStarted={handleGetStarted} />
         <div id="file-uploader">
           {!showResults ? (
-            <FileUploader onAnalysisComplete={handleAnalysisComplete} />
+            <FileUploader onAnalyze={handleAnalyze} />
           ) : (
-            <ResultsCard 
-              coverage={analysisResults.coverage}
-              risks={analysisResults.risks}
-              recommendations={analysisResults.recommendations}
-              onExportReport={handleExportReport}
-            />
+            analysisResult && (
+              <ResultsCard 
+                result={analysisResult}
+                onExportReport={handleExportReport}
+              />
+            )
           )}
         </div>
         <Testimonials />
