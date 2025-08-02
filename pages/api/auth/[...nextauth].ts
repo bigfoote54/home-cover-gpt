@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import EmailProvider from 'next-auth/providers/email'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '../../../lib/prisma'
 
 export default NextAuth({
@@ -16,6 +17,36 @@ export default NextAuth({
         },
       },
       from: process.env.EMAIL_FROM,
+    }),
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        supabaseUserId: { label: 'Supabase User ID', type: 'text' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) {
+          return null
+        }
+
+        // Check if user exists in our database
+        let user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        })
+
+        // If user doesn't exist and we have a Supabase user ID, create the user
+        if (!user && credentials.supabaseUserId) {
+          user = await prisma.user.create({
+            data: {
+              email: credentials.email,
+              id: credentials.supabaseUserId,
+            },
+          })
+        }
+
+        return user
+      },
     }),
   ],
   session: {
