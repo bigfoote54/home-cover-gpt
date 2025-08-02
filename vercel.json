@@ -9,7 +9,7 @@
   },
   "build": {
     "env": {
-      "DATABASE_URL": "your-postgresql-connection-string-here"
+      "DATABASE_URL": "@database_url"
     }
   },
   "version": 2
