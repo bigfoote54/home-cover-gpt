@@ -28,8 +28,9 @@ describe('Policy analysis flow', () => {
     cy.get('label[for="consent"]').click()
     cy.wait(500) // Wait for state update
     cy.intercept('POST', '/api/parse', { 
-      error: 'Failed to parse PDF.' 
-    }, { statusCode: 500 })
+      statusCode: 500,
+      body: { error: 'Failed to parse PDF.' }
+    })
     cy.get('[data-testid="analyze-button"]').click({ force: true })
     cy.contains('Failed to parse PDF').should('exist')
   })
