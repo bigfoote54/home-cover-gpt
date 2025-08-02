@@ -1,2 +1,14 @@
-/* Global CSS styles */
-/* This file can be used for additional global styles if needed */
+:root {
+  --color-background: #F0F4F8;
+  --color-foreground: #1F2937;
+  --color-accent:     #3B82F6;
+}
+.dark {
+  --color-background: #1F2937;
+  --color-foreground: #F9FAFB;
+  --color-accent:     #6366F1;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

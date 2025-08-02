@@ -3,17 +3,18 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './app/**/*.{js,ts,jsx,tsx}',
-    './lib/**/*.{js,ts,jsx,tsx}',
-    './styles/**/*.{js,ts,jsx,tsx,css}'
+    './styles/**/*.css',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       screens: {
         'xs': '475px',
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
+        accent: 'var(--color-accent)',
         card: 'hsl(var(--card))',
         'card-foreground': 'hsl(var(--card-foreground))',
         popover: 'hsl(var(--popover))',
@@ -24,7 +25,6 @@ module.exports = {
         'secondary-foreground': 'hsl(var(--secondary-foreground))',
         muted: 'hsl(var(--muted))',
         'muted-foreground': 'hsl(var(--muted-foreground))',
-        accent: 'hsl(var(--accent))',
         'accent-foreground': 'hsl(var(--accent-foreground))',
         success: 'hsl(var(--success))',
         'success-foreground': 'hsl(var(--success-foreground))',
