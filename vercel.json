@@ -1,5 +1,5 @@
 {
-  "buildCommand": "./build.sh",
+  "buildCommand": "chmod +x ./build.sh && ./build.sh",
   "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
