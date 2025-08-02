@@ -1,7 +1,6 @@
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { useAuth } from '../hooks/useAuth'
 
 interface Analysis {
   id: string
@@ -12,21 +11,21 @@ interface Analysis {
 }
 
 export default function History() {
-  const { data: session, status } = useSession()
+  const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (isLoading) return
 
-    if (!session) {
-      signIn()
+    if (!isAuthenticated) {
+      router.push('/')
       return
     }
 
     fetchAnalyses()
-  }, [session, status])
+  }, [isAuthenticated, isLoading, router])
 
   const fetchAnalyses = async () => {
     try {
@@ -75,7 +74,7 @@ export default function History() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (isLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -86,8 +85,8 @@ export default function History() {
     )
   }
 
-  if (!session) {
-    return null // Will redirect to sign in
+  if (!isAuthenticated) {
+    return null // Will redirect to home
   }
 
   return (
