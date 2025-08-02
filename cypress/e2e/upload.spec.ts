@@ -1,4 +1,9 @@
 describe('Policy analysis flow', () => {
+  it('loads the homepage', () => {
+    cy.visit('/')
+    cy.contains('Home Cover GPT').should('exist')
+  })
+
   it('uploads PDF and shows results', () => {
     cy.visit('/')
     cy.get('[data-testid="file-input"]').attachFile('sample.pdf')
