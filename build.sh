@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Starting build process for version 1.0.3..."
+echo "Starting build process for version 1.0.4..."
 echo "Generating Prisma client..."
 npx prisma generate
 echo "Building Next.js application..."

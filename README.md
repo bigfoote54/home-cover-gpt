@@ -61,6 +61,6 @@ npm run build
 npm run start
 ```
 
-## Version 1.0.3
+## Version 1.0.4
 
-Latest version with all roadmap features implemented and tested.
+Latest version with all roadmap features implemented and tested. Force deployment with build script.
