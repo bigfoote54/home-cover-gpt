@@ -101,11 +101,12 @@ const AnalysesPage = () => {
               placeholder="Search analyses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Search insurance analyses"
             />
           </div>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-accent">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
@@ -160,14 +161,26 @@ const AnalysesPage = () => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => window.location.href = `/analyses/${analysis.id}`}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => window.location.href = `/analyses/${analysis.id}`}
+                      className="focus:outline-none focus:ring-2 focus:ring-accent"
+                      aria-label={`View details for ${analysis.title}`}
+                    >
                       <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => {
-                      console.log(`Downloading analysis: ${analysis.title}`);
-                      alert(`Download started for ${analysis.title}`);
-                    }}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => {
+                        console.log(`Downloading analysis: ${analysis.title}`);
+                        alert(`Download started for ${analysis.title}`);
+                      }}
+                      className="focus:outline-none focus:ring-2 focus:ring-accent"
+                      aria-label={`Download ${analysis.title} analysis`}
+                    >
                       <Download className="w-4 h-4 mr-1" />
                       Download
                     </Button>
@@ -190,7 +203,11 @@ const AnalysesPage = () => {
                 }
               </p>
               {!searchTerm && filterType === "all" && (
-                <Button className="mt-4" onClick={() => window.location.href = "/"}>
+                <Button 
+                  className="mt-4 focus:outline-none focus:ring-2 focus:ring-accent" 
+                  onClick={() => window.location.href = "/"}
+                  aria-label="Upload your first insurance policy"
+                >
                   Upload Policy
                 </Button>
               )}

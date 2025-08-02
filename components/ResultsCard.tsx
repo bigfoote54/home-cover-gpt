@@ -7,9 +7,87 @@ import { AnalysisResult } from "@/shared/types";
 interface ResultsCardProps {
   result: AnalysisResult;
   onExportReport?: () => void;
+  isLoading?: boolean;
 }
 
-const ResultsCard = ({ result, onExportReport }: ResultsCardProps) => {
+const ResultsCard = ({ result, onExportReport, isLoading = false }: ResultsCardProps) => {
+  if (isLoading) {
+    return (
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="space-y-8 animate-slide-up">
+          {/* Coverage Summary Card Skeleton */}
+          <Card className="card-elevated border-l-4 border-l-success shadow-soft">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-6 bg-gray-200 rounded animate-pulse w-48" />
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
+                  </div>
+                </div>
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-24" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[1, 2, 3].map((index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-gray-100 rounded-lg">
+                    <div className="w-5 h-5 bg-gray-200 rounded animate-pulse flex-shrink-0" />
+                    <div className="space-y-2 flex-1">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Gaps and Risks Skeleton */}
+          <Card className="card-elevated shadow-soft">
+            <CardHeader>
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-48" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[1, 2].map((index) => (
+                <div key={index} className="p-4 bg-gray-100 rounded-lg border">
+                  <div className="flex items-start gap-3">
+                    <div className="w-4 h-4 bg-gray-200 rounded animate-pulse flex-shrink-0" />
+                    <div className="space-y-2 flex-1">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Recommendations Skeleton */}
+          <Card className="card-elevated shadow-soft">
+            <CardHeader>
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-40" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[1, 2, 3].map((index) => (
+                <div key={index} className="flex items-start gap-3 p-4 bg-gray-100 rounded-lg border">
+                  <div className="w-5 h-5 bg-gray-200 rounded animate-pulse flex-shrink-0" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-36" />
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6" />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="space-y-8 animate-slide-up">
@@ -26,7 +104,13 @@ const ResultsCard = ({ result, onExportReport }: ResultsCardProps) => {
                   <p className="text-muted-foreground">Analysis completed successfully</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="focus-ring" onClick={onExportReport}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="focus:outline-none focus:ring-2 focus:ring-accent" 
+                onClick={onExportReport}
+                aria-label="Export analysis report as PDF"
+              >
                 Export Report
               </Button>
             </div>

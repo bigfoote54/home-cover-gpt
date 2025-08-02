@@ -59,10 +59,11 @@ const Hero = ({ onGetStarted }: HeroProps) => {
         <div className="mt-12 animate-scale-in">
           <Button 
             size="lg"
-            className="btn-hero px-8 py-4 text-lg font-semibold rounded-full shadow-glow group"
+            className="btn-hero px-6 py-3 sm:px-8 sm:py-4 text-lg font-semibold rounded-full shadow-glow group focus:outline-none focus:ring-2 focus:ring-accent"
             onClick={onGetStarted}
+            aria-label="Get started with insurance coverage analysis"
           >
-            Start Your Analysis
+            Get My Coverage Summary
             <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
           

@@ -96,7 +96,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -164,13 +164,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              className="flex-1"
+              className="flex-1 focus:outline-none focus:ring-2 focus:ring-accent"
               disabled={isLoading}
+              aria-label="Type your message"
             />
             <Button 
               onClick={handleSendMessage} 
               disabled={!inputValue.trim() || isLoading}
               size="icon"
+              className="focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Send message"
             >
               <Send className="w-4 h-4" />
             </Button>

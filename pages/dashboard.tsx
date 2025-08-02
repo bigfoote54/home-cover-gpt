@@ -104,7 +104,13 @@ const DashboardPage = () => {
                       <p className="text-sm text-muted-foreground">{analysis.type} • {analysis.date}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => window.location.href = `/analyses/${analysis.id}`}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => window.location.href = `/analyses/${analysis.id}`}
+                    className="focus:outline-none focus:ring-2 focus:ring-accent"
+                    aria-label={`View details for ${analysis.title}`}
+                  >
                     View Details
                   </Button>
                 </div>
@@ -117,19 +123,39 @@ const DashboardPage = () => {
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/"}>
+            <Button 
+              className="h-20 flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-accent" 
+              variant="outline" 
+              onClick={() => window.location.href = "/"}
+              aria-label="Start a new insurance analysis"
+            >
               <FileText className="w-6 h-6" />
               <span>New Analysis</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/analyses"}>
+            <Button 
+              className="h-20 flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-accent" 
+              variant="outline" 
+              onClick={() => window.location.href = "/analyses"}
+              aria-label="Review all insurance policies"
+            >
               <CheckCircle className="w-6 h-6" />
               <span>Review Policies</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/profile"}>
+            <Button 
+              className="h-20 flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-accent" 
+              variant="outline" 
+              onClick={() => window.location.href = "/profile"}
+              aria-label="Check policy renewal dates"
+            >
               <Clock className="w-6 h-6" />
               <span>Check Renewals</span>
             </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline" onClick={() => window.location.href = "/upgrade"}>
+            <Button 
+              className="h-20 flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-accent" 
+              variant="outline" 
+              onClick={() => window.location.href = "/upgrade"}
+              aria-label="Get insurance quotes"
+            >
               <AlertCircle className="w-6 h-6" />
               <span>Get Quotes</span>
             </Button>
