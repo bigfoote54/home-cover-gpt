@@ -1,6 +1,7 @@
 import { Shield, UserCircle, ChevronDown, User, Settings, LogOut, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +56,9 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* Upgrade Button */}
             <Button 
               className="btn-hero hidden sm:inline-flex px-6 py-2 rounded-full text-sm font-semibold"
