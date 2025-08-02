@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { 
   computeFileHash, 
   getCachedAnalysis, 
@@ -6,6 +6,17 @@ import {
   clearCache, 
   getCacheStats 
 } from '@/lib/cache';
+
+// Mock crypto.subtle for tests
+const mockDigest = vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]));
+Object.defineProperty(global, 'crypto', {
+  value: {
+    subtle: {
+      digest: mockDigest
+    }
+  },
+  writable: true
+});
 
 describe('Cache functionality', () => {
   beforeEach(() => {
