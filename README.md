@@ -61,8 +61,10 @@ npm run build
 npm run start
 ```
 
-## Version 1.0.5
+## Version 1.0.7
 
 Latest version with all roadmap features implemented and tested. Force deployment with build script and Prisma generation.
 
 **Production deployment triggered from main branch.**
+**Testing database connection fix.**
+**Added nodemailer dependency for NextAuth email provider.**
