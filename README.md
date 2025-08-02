@@ -108,6 +108,42 @@ npm install
 npm run dev
 ```
 
+## Testing
+
+This project includes comprehensive testing with both unit tests (Vitest) and end-to-end tests (Cypress).
+
+### Running Tests
+
+```bash
+# Run all tests (unit + e2e)
+npm test
+
+# Run unit tests only
+npm run test:unit
+
+# Run e2e tests only
+npm run test:e2e
+```
+
+### Test Structure
+
+- **Unit Tests**: Located in `__tests__/` directory
+  - `analyzePolicy.test.ts`: Tests the OpenAI policy analysis function
+  - `FileUploader.test.tsx`: Tests the file upload component
+
+- **E2E Tests**: Located in `cypress/e2e/` directory
+  - `upload.spec.ts`: Tests the complete file upload and analysis flow
+
+### CI/CD Integration
+
+The project includes GitHub Actions workflow (`.github/workflows/ci.yml`) that automatically runs:
+- Linting
+- Building
+- Unit tests
+- E2E tests
+
+All tests must pass before code can be merged to main branches.
+
 ## Security
 
 - API keys are loaded server-side only via `process.env.OPENAI_API_KEY`
