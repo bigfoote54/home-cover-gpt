@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
-import { Upload, File, X, CloudUpload, FileText, Loader2, AlertCircle } from "lucide-react";
+import { Upload, File, X, CloudUpload, FileText, Loader2, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner, ProcessingSteps } from "@/components/ui/loading-spinner";
 import { ErrorState } from "@/components/ui/error-state";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AnalysisResult } from "@/shared/types";
 
 interface FileUploaderProps {
@@ -50,13 +51,21 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type === 'application/pdf') {
       setFile(droppedFile);
+      setError(null);
+    } else {
+      setError('Please upload a valid PDF file.');
     }
   }, []);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
+      if (selectedFile.type === 'application/pdf') {
+        setFile(selectedFile);
+        setError(null);
+      } else {
+        setError('Please select a valid PDF file.');
+      }
     }
   }, []);
 
@@ -159,6 +168,15 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload area for insurance policy PDF"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  document.getElementById('file-input')?.click();
+                }
+              }}
             >
               <div className="flex flex-col items-center space-y-6">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
@@ -177,13 +195,15 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
                   </h3>
                   <p className="text-muted-foreground">
                     or{" "}
-                    <label className="text-primary hover:text-primary/80 cursor-pointer underline font-medium focus-ring rounded">
+                    <label className="text-primary hover:text-primary/80 cursor-pointer underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded">
                       browse to upload
                       <input
+                        id="file-input"
                         type="file"
                         accept=".pdf"
                         onChange={handleFileSelect}
                         className="hidden"
+                        aria-label="Select PDF file to upload"
                       />
                     </label>
                   </p>
@@ -212,7 +232,8 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={removeFile}
-                  className="text-muted-foreground hover:text-destructive focus-ring"
+                  className="text-muted-foreground hover:text-destructive focus:outline-none focus:ring-2 focus:ring-accent"
+                  aria-label="Remove uploaded file"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -220,14 +241,16 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
 
               {/* Error State */}
               {error && (
-                <ErrorState
-                  title="Analysis Failed"
-                  message={error}
-                  onRetry={handleAnalyze}
-                  onDismiss={() => setError(null)}
-                  variant="critical"
-                  className="mt-4"
-                />
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-red-600 font-medium" role="alert">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* Progress and Steps */}
@@ -257,13 +280,25 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
                 id="consent"
                 checked={hasConsented}
                 onCheckedChange={(checked) => setHasConsented(checked as boolean)}
-                className="mt-1"
+                className="mt-1 focus:outline-none focus:ring-2 focus:ring-accent"
               />
-              <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                <span className="text-foreground font-medium">Data Processing Consent:</span>{" "}
-                I consent to have my document analyzed by AI. My data will be processed securely using 
-                bank-level encryption and completely deleted within 24 hours of analysis.
-              </label>
+              <div className="flex items-start space-x-2">
+                <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                  <span className="text-foreground font-medium">Data Processing Consent:</span>{" "}
+                  I consent to have my document analyzed by AI. My data will be processed securely using 
+                  bank-level encryption and completely deleted within 24 hours of analysis.
+                </label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-5 w-5 text-gray-400 ml-1 mt-0.5" aria-hidden="true" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Your document is processed securely and deleted after analysis.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
           </div>
           
@@ -271,9 +306,10 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
           <div className="mt-8">
             <Button 
               size="lg"
-              className="w-full btn-hero text-lg font-semibold py-4 rounded-xl group"
+              className="w-full btn-hero text-lg font-semibold py-3 px-6 sm:py-4 sm:px-8 rounded-xl group focus:outline-none focus:ring-2 focus:ring-accent"
               onClick={handleAnalyze}
               disabled={!file || !hasConsented || isAnalyzing}
+              aria-label="Start analysis of uploaded insurance policy"
             >
               {isAnalyzing ? (
                 <>
@@ -283,7 +319,7 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
               ) : (
                 <>
                   <Upload className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  Analyze My Coverage
+                  Run Analysis →
                 </>
               )}
             </Button>
