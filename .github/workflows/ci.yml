@@ -28,3 +28,16 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Start development server
+        run: |
+          npm run dev &
+          timeout 30 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run e2e tests
+        run: npm run test:e2e
