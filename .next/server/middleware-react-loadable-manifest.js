@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}";
+self.__REACT_LOADABLE_MANIFEST='{"index.tsx -> @/components/Dashboard/Footer":{"id":9664,"files":["static/chunks/664-36c49ccaae94093a.js","static/chunks/75.f154074f6ca3640c.js"]},"index.tsx -> @/components/Dashboard/Testimonials":{"id":2292,"files":["static/chunks/292.a6d754b9d8639d8d.js"]},"index.tsx -> @/components/ResultsCard":{"id":6653,"files":["static/chunks/51.f1f5e4da7fb14aec.js"]}}';

@@ -6,6 +6,12 @@ interface HeroProps {
 }
 
 const Hero = ({ onGetStarted }: HeroProps) => {
+  // Prefetch the parse API on hover
+  const prefetchParse = () => {
+    fetch('/api/parse', { method: 'HEAD' }).catch(() => {
+      // Silently fail - this is just for warming up the connection
+    });
+  };
   return (
     <section className="relative pt-24 pb-20 overflow-hidden">
       {/* Background gradient with subtle pattern */}
@@ -61,6 +67,7 @@ const Hero = ({ onGetStarted }: HeroProps) => {
             size="lg"
             className="btn-hero px-6 py-3 sm:px-8 sm:py-4 text-lg font-semibold rounded-full shadow-glow group focus:outline-none focus:ring-2 focus:ring-accent"
             onClick={onGetStarted}
+            onMouseEnter={prefetchParse}
             aria-label="Get started with insurance coverage analysis"
           >
             Get My Coverage Summary
