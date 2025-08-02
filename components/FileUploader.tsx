@@ -199,6 +199,7 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
                       browse to upload
                       <input
                         id="file-input"
+                        data-testid="file-input"
                         type="file"
                         accept=".pdf"
                         onChange={handleFileSelect}
@@ -310,6 +311,7 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
               onClick={handleAnalyze}
               disabled={!file || !hasConsented || isAnalyzing}
               aria-label="Start analysis of uploaded insurance policy"
+              data-testid="analyze-button"
             >
               {isAnalyzing ? (
                 <>
