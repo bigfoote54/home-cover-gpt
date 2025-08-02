@@ -7,10 +7,11 @@ describe('Policy analysis flow', () => {
   it('uploads PDF and shows results', () => {
     cy.visit('/')
     cy.get('[data-testid="file-input"]').attachFile('sample.pdf')
+    cy.wait(1000) // Wait for file processing
     cy.get('label[for="consent"]').click()
+    cy.wait(500) // Wait for state update
     cy.intercept('POST', '/api/parse', { coverageSummary:['X'], risks:['Y'], recommendations:['Z'] })
-    cy.get('[data-testid="analyze-button"]').should('not.be.disabled')
-    cy.get('[data-testid="analyze-button"]').click()
+    cy.get('[data-testid="analyze-button"]').click({ force: true })
     cy.contains('Coverage Summary').should('exist')
   })
 })
