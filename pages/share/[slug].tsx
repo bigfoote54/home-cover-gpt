@@ -2,6 +2,7 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
+// Force new deployment - Vercel should pick up latest changes
 interface Analysis {
   id: string
   createdAt: string

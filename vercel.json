@@ -11,5 +11,6 @@
     "env": {
       "DATABASE_URL": "@database_url"
     }
-  }
+  },
+  "version": 2
 }
