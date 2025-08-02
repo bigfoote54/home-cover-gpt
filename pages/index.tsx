@@ -1,11 +1,26 @@
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import Header from "@/components/Dashboard/Header";
 import Hero from "@/components/Hero";
 import FileUploader from "@/components/FileUploader";
-import ResultsCard from "@/components/ResultsCard";
-import Testimonials from "@/components/Dashboard/Testimonials";
-import Footer from "@/components/Dashboard/Footer";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AnalysisResult } from "@/shared/types";
+
+// Lazy-load non-critical components
+const ResultsCard = dynamic(() => import("@/components/ResultsCard"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-96 w-full" />
+});
+
+const Testimonials = dynamic(() => import("@/components/Dashboard/Testimonials"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-64 w-full" />
+});
+
+const Footer = dynamic(() => import("@/components/Dashboard/Footer"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-32 w-full" />
+});
 
 const Index = () => {
   const [showResults, setShowResults] = useState(false);

@@ -8,6 +8,7 @@ import { LoadingSpinner, ProcessingSteps } from "@/components/ui/loading-spinner
 import { ErrorState } from "@/components/ui/error-state";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AnalysisResult } from "@/shared/types";
+import { computeFileHash, getCachedAnalysis, cacheAnalysis } from "@/lib/cache";
 
 interface FileUploaderProps {
   onAnalyze?: (file: File) => Promise<AnalysisResult>;
@@ -97,10 +98,30 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
     resetProcessingState();
 
     try {
-      // Step 1: Upload and process
+      // Step 1: Check cache first
       setCurrentStep('upload');
       updateStepStatus('upload', 'processing');
       setUploadProgress(25);
+      
+      const fileHash = await computeFileHash(file);
+      const cachedResult = getCachedAnalysis(fileHash);
+      
+      if (cachedResult) {
+        // Return cached result immediately
+        updateStepStatus('upload', 'completed');
+        updateStepStatus('extract', 'completed');
+        updateStepStatus('analyze', 'completed');
+        updateStepStatus('complete', 'completed');
+        setUploadProgress(100);
+        
+        setTimeout(() => {
+          setIsAnalyzing(false);
+        }, 500);
+        
+        // Call onAnalyze with cached result
+        await onAnalyze(file);
+        return;
+      }
       
       updateStepStatus('upload', 'completed');
       updateStepStatus('extract', 'processing');
@@ -112,6 +133,10 @@ const FileUploader = ({ onAnalyze }: FileUploaderProps) => {
       setUploadProgress(75);
       
       const analysisResult = await onAnalyze(file);
+      
+      // Cache the result
+      cacheAnalysis(fileHash, analysisResult);
+      
       updateStepStatus('analyze', 'completed');
       setUploadProgress(90);
 

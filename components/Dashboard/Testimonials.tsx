@@ -95,6 +95,7 @@ const Testimonials = () => {
                       src={testimonial.avatar} 
                       alt={testimonial.name}
                       className="object-cover"
+                      loading="lazy"
                     />
                     <AvatarFallback className="bg-gradient-primary text-white font-semibold">
                       {testimonial.initials}
