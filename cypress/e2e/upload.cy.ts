@@ -32,6 +32,6 @@ describe('Policy analysis flow', () => {
       body: { error: 'Failed to parse PDF.' }
     })
     cy.get('[data-testid="analyze-button"]').click({ force: true })
-    cy.contains('Failed to parse PDF').should('exist')
+    cy.contains('Analysis failed').should('exist')
   })
 })
