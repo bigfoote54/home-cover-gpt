@@ -102,6 +102,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   try {
     const { slug } = params as { slug: string }
 
+    // Check if DATABASE_URL is available (for build-time safety)
+    if (!process.env.DATABASE_URL) {
+      return {
+        props: {
+          analysis: null,
+          error: 'Database not configured.',
+        },
+      }
+    }
+
     const analysis = await prisma.analysis.findUnique({
       where: {
         shareSlug: slug,
@@ -129,6 +139,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     }
   } catch (error) {
     console.error('Error fetching shared analysis:', error)
+    
+    // If it's a Prisma client error during build, return a fallback
+    if (error instanceof Error && error.message.includes('PrismaClientInitializationError')) {
+      return {
+        props: {
+          analysis: null,
+          error: 'Database connection not available during build.',
+        },
+      }
+    }
+    
     return {
       props: {
         analysis: null,
