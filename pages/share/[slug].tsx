@@ -1,5 +1,6 @@
-import { GetServerSideProps } from 'next'
-import { prisma } from '../../lib/prisma'
+import { GetStaticProps, GetStaticPaths } from 'next'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 interface Analysis {
   id: string
@@ -9,28 +10,54 @@ interface Analysis {
 }
 
 interface SharePageProps {
-  analysis: Analysis | null
-  error?: string
+  slug: string
 }
 
-export default function SharePage({ analysis, error }: SharePageProps) {
-  if (error) {
+export default function SharePage({ slug }: SharePageProps) {
+  const router = useRouter()
+  const [analysis, setAnalysis] = useState<Analysis | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch(`/api/share/${slug}`)
+        if (response.ok) {
+          const data = await response.json()
+          setAnalysis(data.analysis)
+        } else {
+          setError('Analysis not found')
+        }
+      } catch (err) {
+        setError('Failed to load analysis')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (slug) {
+      fetchAnalysis()
+    }
+  }, [slug])
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Analysis Not Found</h1>
-          <p className="text-gray-600">{error}</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+          <p className="mt-4 text-gray-600">Loading analysis...</p>
         </div>
       </div>
     )
   }
 
-  if (!analysis) {
+  if (error || !analysis) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Analysis Not Found</h1>
+          <p className="text-gray-600">{error || 'This analysis could not be found.'}</p>
         </div>
       </div>
     )
@@ -98,63 +125,21 @@ export default function SharePage({ analysis, error }: SharePageProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  try {
-    const { slug } = params as { slug: string }
+// Return empty paths to avoid build-time generation
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  }
+}
 
-    // Check if DATABASE_URL is available (for build-time safety)
-    if (!process.env.DATABASE_URL) {
-      return {
-        props: {
-          analysis: null,
-          error: 'Database not configured.',
-        },
-      }
-    }
-
-    const analysis = await prisma.analysis.findUnique({
-      where: {
-        shareSlug: slug,
-      },
-    })
-
-    if (!analysis) {
-      return {
-        props: {
-          analysis: null,
-          error: 'This analysis could not be found or has been removed.',
-        },
-      }
-    }
-
-    return {
-      props: {
-        analysis: {
-          id: analysis.id,
-          createdAt: analysis.createdAt.toISOString(),
-          resultJson: analysis.resultJson,
-          shareSlug: analysis.shareSlug,
-        },
-      },
-    }
-  } catch (error) {
-    console.error('Error fetching shared analysis:', error)
-    
-    // If it's a Prisma client error during build, return a fallback
-    if (error instanceof Error && error.message.includes('PrismaClientInitializationError')) {
-      return {
-        props: {
-          analysis: null,
-          error: 'Database connection not available during build.',
-        },
-      }
-    }
-    
-    return {
-      props: {
-        analysis: null,
-        error: 'An error occurred while loading this analysis.',
-      },
-    }
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug } = params as { slug: string }
+  
+  return {
+    props: {
+      slug,
+    },
+    revalidate: 60, // Revalidate every 60 seconds
   }
 }
