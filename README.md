@@ -60,3 +60,7 @@ npm run build
 # Start production server
 npm run start
 ```
+
+## Version 1.0.3
+
+Latest version with all roadmap features implemented and tested.
